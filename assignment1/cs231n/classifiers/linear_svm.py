@@ -82,7 +82,11 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = X.shape[0]
+    scores = X @ W
+    correct_class_score = scores[np.arange(num_train), y]
+    margin = (scores.T - correct_class_score + 1).T
+    loss = margin[margin > 0].sum() / num_train - 1 + reg * np.sum(W * W)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -97,7 +101,12 @@ def svm_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_classes = W.shape[1]
+    dXW = np.zeros((num_train, num_classes))
+    dXW[margin > 0] = 1
+    dXW[np.arange(num_train), y] = 1 - dXW.sum(1)
+    dXW /= num_train
+    dW = X.T @ dXW + 2 * reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
