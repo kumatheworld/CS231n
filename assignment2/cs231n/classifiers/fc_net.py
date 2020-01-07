@@ -201,7 +201,7 @@ class FullyConnectedNet(object):
             else:
                 dim_out = num_classes
 
-            self.params[f'W{i}'] = np.random.randn(dim_in, dim_out)
+            self.params[f'W{i}'] = weight_scale * np.random.randn(dim_in, dim_out)
             self.params[f'b{i}'] = np.zeros(dim_out)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
