@@ -320,7 +320,7 @@ def batchnorm_backward_alt(dout, cache):
 
     dbeta = dout.sum(0)
     dgamma = np.sum(dout * xhat, 0)
-    dx = gamma * (dout - dout.sum(0)/N - np.sum(dout*xhat,0)*xhat/(N-1)) / std_like
+    dx = gamma * (dout - dbeta/N - dgamma*xhat/(N-1)) / std_like
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -408,12 +408,12 @@ def layernorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    N = dout.shape[0]
     x, std_like, xhat, gamma = cache
 
     dbeta = dout.sum(0)
     dgamma = np.sum(dout * xhat, 0)
-    dx = gamma * (dout - (dout.sum(1,keepdims=True) + np.sum(dout*xhat,1,keepdims=True)*xhat)/N) / std_like
+    dgamma_xhat = gamma * dout
+    dx = (dgamma_xhat - np.mean(dgamma_xhat, 1,keepdims=True) - np.mean(dgamma_xhat*xhat,1,keepdims=True)*xhat) / std_like
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
