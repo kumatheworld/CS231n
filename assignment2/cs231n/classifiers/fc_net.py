@@ -280,6 +280,9 @@ class FullyConnectedNet(object):
                     cache = cache1, cache2, cache3
                 else:
                     x, cache = affine_relu_forward(x, self.params[f'W{i}'], self.params[f'b{i}'])
+                if self.use_dropout:
+                    x, cache_do = dropout_forward(x, self.dropout_param)
+                    cache = cache, cache_do
             else:
                 x, cache = affine_forward(x, self.params[f'W{i}'], self.params[f'b{i}'])
             caches.append(cache)
@@ -316,13 +319,18 @@ class FullyConnectedNet(object):
             if i == self.num_layers:
                 dx, grads[f'W{i}'], grads[f'b{i}'] = affine_backward(dscores, caches[i])
             else:
+                cache = caches[i]
+                if self.use_dropout:
+                    cache, cache_do = cache
+                    dx = dropout_backward(dx, cache_do)
+
                 if self.normalization=='batchnorm':
-                    cache1, cache2, cache3 = caches[i]
+                    cache1, cache2, cache3 = cache
                     dx = relu_backward(dx, cache3)
                     dx, grads[f'gamma{i}'], grads[f'beta{i}'] = batchnorm_backward(dx, cache2)
                     dx, grads[f'W{i}'], grads[f'b{i}'] = affine_backward(dx, cache1)
                 else:
-                    dx, grads[f'W{i}'], grads[f'b{i}'] = affine_relu_backward(dx, caches[i])
+                    dx, grads[f'W{i}'], grads[f'b{i}'] = affine_relu_backward(dx, cache)
 
             Wi = self.params[f'W{i}']
             loss += 0.5 * self.reg * np.sum(Wi*Wi)
