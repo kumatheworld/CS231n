@@ -2,6 +2,7 @@
 *.pyc
 .env/*
 *.ipynb_checkpoints/
+*.so
 
 # gitignore the built release.
 assignment3/*
@@ -9,3 +10,5 @@ assignment3/*
 # Pipenv files
 Pipfile
 Pipfile.lock
+
+
