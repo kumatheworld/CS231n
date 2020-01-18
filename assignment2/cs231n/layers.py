@@ -553,7 +553,23 @@ def conv_forward_naive(x, w, b, conv_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    stride, pad = conv_param['stride'], conv_param['pad']
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    HHH = 1 + (H + 2 * pad - HH) // stride
+    WWW = 1 + (W + 2 * pad - WW) // stride
+    out = np.zeros((N, F, HHH, WWW))
+
+    for yyy in range(HHH):
+        for xxx in range(WWW):
+            for yy in range(HH):
+                yyyy = stride * yyy + yy - pad
+                if 0 <= yyyy < H:
+                    for xx in range(WW):
+                        xxxx = stride * xxx + xx - pad
+                        if 0 <= xxxx < W:
+                            out[:, :, yyy, xxx] += x[:, :, yyyy, xxxx] @ w[:, :, yy, xx].T
+            out[:, :, yyy, xxx] += b
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -582,7 +598,38 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x, w, b, conv_param = cache
+    stride, pad = conv_param['stride'], conv_param['pad']
+
+    N, C, H, W = x.shape
+    F, _, HH, WW = w.shape
+    N, _, HHH, WWW = dout.shape
+
+    db = dout.sum(axis=(0,2,3))
+
+    dw = np.zeros_like(w)
+    dx = np.zeros_like(x)
+
+    for yy in range(HH):
+        for xx in range(WW):
+            for yyy in range(HHH):
+                yyyy = yy + stride * yyy - pad
+                if 0 <= yyyy < H:
+                    for xxx in range(WWW):
+                        xxxx = xx + stride * xxx - pad
+                        if 0 <= xxxx < W:
+                            dw[:, :, yy, xx] += dout[:, :, yyy, xxx].T @ x[:, :, yyyy, xxxx]
+
+    for yyyy in range(H):
+        for xxxx in range(W):
+            for yyy in range(HHH):
+                yy = yyyy - stride * yyy + pad
+                if 0 <= yy < HH:
+                    for xxx in range(WWW):
+                        xx = xxxx - stride * xxx + pad
+                        if 0 <= xx < WW:
+                            dx[:, :, yyyy, xxxx] += dout[:, :, yyy, xxx] @ w[:, :, yy, xx]
+
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
