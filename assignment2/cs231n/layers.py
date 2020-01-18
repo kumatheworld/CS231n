@@ -554,7 +554,7 @@ def conv_forward_naive(x, w, b, conv_param):
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
     stride, pad = conv_param['stride'], conv_param['pad']
-    N, C, H, W = x.shape
+    N, _, H, W = x.shape
     F, _, HH, WW = w.shape
     HHH = 1 + (H + 2 * pad - HH) // stride
     WWW = 1 + (W + 2 * pad - WW) // stride
@@ -601,9 +601,9 @@ def conv_backward_naive(dout, cache):
     x, w, b, conv_param = cache
     stride, pad = conv_param['stride'], conv_param['pad']
 
-    N, C, H, W = x.shape
-    F, _, HH, WW = w.shape
-    N, _, HHH, WWW = dout.shape
+    _, _, H, W = x.shape
+    _, _, HH, WW = w.shape
+    _, _, HHH, WWW = dout.shape
 
     db = dout.sum(axis=(0,2,3))
 
@@ -663,7 +663,20 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    N, C, H, W = x.shape
+
+    Hy = 1 + (H - pool_height) // stride
+    Wy = 1 + (W - pool_width) // stride
+    out = np.empty((N, C, Hy, Wy))
+
+    for hy in range(Hy):
+        hx0 = hy * stride
+        for wy in range(Wy):
+            wx0 = wy * stride
+            out[:, :, hy, wy] = np.max(x[:, :, hx0:hx0+pool_height, wx0:wx0+pool_width], axis=(2, 3))
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -690,7 +703,24 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x, pool_param = cache
+    pool_height = pool_param['pool_height']
+    pool_width = pool_param['pool_width']
+    stride = pool_param['stride']
+    N, C, Hy, Wy = dout.shape
+
+    dx = np.zeros_like(x)
+    for n in range(N):
+        for c in range(C):
+            for hy in range(Hy):
+                hx0 = hy * stride
+                for wy in range(Wy):
+                    wx0 = wy * stride
+                    hx, wx = np.unravel_index(
+                        x[n, c, hx0:hx0+pool_height, wx0:wx0+pool_width].argmax(),
+                        (pool_height, pool_width)
+                    )
+                    dx[n, c, hx0 + hx, wx0 + wx] = dout[n, c, hy, wy]
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
