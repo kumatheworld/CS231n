@@ -762,7 +762,10 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x_tr = x.transpose(0, 2, 3, 1)
+    x_flat = x_tr.reshape(-1, x.shape[1])
+    out_flat, cache = batchnorm_forward(x_flat, gamma, beta, bn_param)
+    out = out_flat.reshape(x_tr.shape).transpose(0, 3, 1, 2)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -796,7 +799,10 @@ def spatial_batchnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dout_tr = dout.transpose(0, 2, 3, 1)
+    dout_flat = dout_tr.reshape(-1, dout.shape[1])
+    dx_flat, dgamma, dbeta = batchnorm_backward(dout_flat, cache)
+    dx = dx_flat.reshape(dout_tr.shape).transpose(0, 3, 1, 2)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -836,7 +842,18 @@ def spatial_groupnorm_forward(x, gamma, beta, G, gn_param):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x_flat = x.reshape(x.shape[0] * G, -1)
+
+    sample_mean = x_flat.mean(1, keepdims=True)
+    sample_var = x_flat.var(1, keepdims=True)
+    xcentered = x_flat - sample_mean
+    std_like = np.sqrt(sample_var + eps)
+    xhat = xcentered / std_like
+
+    xhat_reshaped = xhat.reshape(x.shape)
+    out = gamma * xhat_reshaped + beta
+
+    cache = G, std_like, xhat, gamma
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -866,7 +883,15 @@ def spatial_groupnorm_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    G, std_like, xhat, gamma = cache
+    dout_flat = dout.reshape(dout.shape[0] * G, -1)
+
+    dbeta = dout.sum((0, 2, 3), keepdims=True)
+    dgamma = np.sum(dout * xhat.reshape(dout.shape), (0, 2, 3), keepdims=True)
+    dgamma_xhat = np.reshape(gamma * dout, dout_flat.shape)
+    dx_flat = (dgamma_xhat - np.mean(dgamma_xhat, 1,keepdims=True) - np.mean(dgamma_xhat*xhat,1,keepdims=True)*xhat) / std_like
+    
+    dx = dx_flat.reshape(dout.shape)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
