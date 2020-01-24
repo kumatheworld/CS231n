@@ -240,10 +240,6 @@ def word_embedding_backward(dout, cache):
 
     x, W_shape = cache
     dW = np.zeros(W_shape)
-    # V = dW.shape[0]
-    # for v in range(V):
-    #     idx = np.stack(np.where(x == v))
-    #     dW[v] += dout[idx[0], idx[1]].sum(0)
     np.add.at(dW, x, dout)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
