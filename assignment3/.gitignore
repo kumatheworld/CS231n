@@ -8,6 +8,3 @@ assignment3/*
 
 # gitignore datasets
 cs231n/datasets/coco_captioning/
-
-# gitignore venv directory
-cs231n-assignment3/
