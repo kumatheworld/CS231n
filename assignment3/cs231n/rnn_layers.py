@@ -173,7 +173,7 @@ def rnn_backward(dh, cache):
         dx.append(dxt)
     dx = np.stack(dx[::-1], 1)
     dh0 = dht
-        
+
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
     #                               END OF YOUR CODE                             #

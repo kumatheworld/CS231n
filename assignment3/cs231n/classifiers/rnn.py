@@ -222,7 +222,14 @@ class CaptioningRNN(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        ht, _ = affine_forward(features, W_proj, b_proj)
+        captions[:, 0] = self._start
+        for t in range(1, max_length):
+            x, _ = word_embedding_forward(captions, W_embed)
+            if self.cell_type == 'rnn':
+                ht, _ = rnn_step_forward(x[:, t], ht, Wx, Wh, b)
+            scores, _ = temporal_affine_forward(ht[:, np.newaxis], W_vocab, b_vocab)
+            captions[:, t] = scores.argmax(2).ravel()
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
