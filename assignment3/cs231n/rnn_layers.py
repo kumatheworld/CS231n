@@ -292,7 +292,19 @@ def lstm_step_forward(x, prev_h, prev_c, Wx, Wh, b):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    a = x @ Wx + prev_h @ Wh + b
+
+    ai, af, ao, ag = np.hsplit(a, 4)
+    i = sigmoid(ai)
+    f = sigmoid(af)
+    o = sigmoid(ao)
+    g = np.tanh(ag)
+    
+    next_c = f * prev_c + i * g
+    tanh_next_c = np.tanh(next_c)
+    next_h = o * tanh_next_c
+    
+    cache = x, Wx, prev_h, Wh, b, prev_c, i, f, o, g, next_c, tanh_next_c
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -328,7 +340,27 @@ def lstm_step_backward(dnext_h, dnext_c, cache):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    x, Wx, prev_h, Wh, b, prev_c, i, f, o, g, next_c, tanh_next_c = cache
+
+    do = dnext_h * tanh_next_c
+    dtanh_next_c = dnext_h * o
+    dnext_c_all = dnext_c + dtanh_next_c * (1 - tanh_next_c * tanh_next_c)
+    dg = dnext_c_all * i
+    di = dnext_c_all * g
+    df = dnext_c_all * prev_c
+    dprev_c = dnext_c_all * f
+    
+    dag = dg * (1 - g * g)
+    dao = do * o * (1 - o)
+    daf = df * f * (1 - f)
+    dai = di * i * (1 - i)
+    
+    da = np.hstack([dai, daf, dao, dag])
+    db = da.sum(0)
+    dWh = prev_h.T @ da
+    dprev_h = da @ Wh.T
+    dWx = x.T @ da
+    dx = da @ Wx.T
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
