@@ -399,7 +399,16 @@ def lstm_forward(x, h0, Wx, Wh, b):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    T = x.shape[1]
+    ht = h0
+    h = []
+    ct = np.zeros_like(ht)
+    cache = []
+    for t in range(T):
+        ht, ct, cachet = lstm_step_forward(x[:, t], ht, ct, Wx, Wh, b)
+        cache.append(cachet)
+        h.append(ht)
+    h = np.stack(h, 1)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
@@ -411,7 +420,7 @@ def lstm_forward(x, h0, Wx, Wh, b):
 
 def lstm_backward(dh, cache):
     """
-    Backward pass for an LSTM over an entire sequence of data.]
+    Backward pass for an LSTM over an entire sequence of data.
 
     Inputs:
     - dh: Upstream gradients of hidden states, of shape (N, T, H)
@@ -431,7 +440,23 @@ def lstm_backward(dh, cache):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = []
+    N, T, H = dh.shape
+    for t in reversed(range(T)):
+        if t == T - 1:
+            dxt, dht, dct, dWxt, dWht, dbt = lstm_step_backward(dh[:, t], np.zeros((N, H)), cache[t])
+            db = dbt
+            dWh = dWht
+            dWx = dWxt
+        else:
+            dxt, dht, dct, dWxt, dWht, dbt = lstm_step_backward(dh[:, t] + dht, dct, cache[t])
+            db += dbt
+            dWh += dWht
+            dWx += dWxt
+        dx.append(dxt)
+
+    dx = np.stack(dx[::-1], 1)
+    dh0 = dht
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ##############################################################################
