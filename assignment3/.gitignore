@@ -8,3 +8,4 @@ assignment3/*
 
 # gitignore datasets
 cs231n/datasets/coco_captioning/
+cs231n/datasets/imagenet_val_25.npz
