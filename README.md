@@ -1,2 +1,2 @@
 # cs231n
- My solutions to the assignments of [CS231n](http://cs231n.stanford.edu/2019/)
+ My assignment solutions for CS231n [CS231n](http://cs231n.stanford.edu/2019/)
