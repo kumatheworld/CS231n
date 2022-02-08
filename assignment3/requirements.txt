@@ -76,6 +76,6 @@ terminado==0.8.3
 testpath==0.4.4
 tornado==4.5.3
 traitlets==4.3.3
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 yarl==1.2.4
 zipp==2.1.0
