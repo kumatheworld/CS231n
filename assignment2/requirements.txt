@@ -54,7 +54,7 @@ python-dateutil==2.8.0
 PyYAML==5.4
 pyzmq==18.0.1
 qtconsole==4.4.3
-scipy==1.2.1
+scipy==1.10.0
 Send2Trash==1.5.0
 six==1.12.0
 # Add this line if you want GPU support for tensorflow!
