@@ -78,4 +78,4 @@ tornado==6.4.1
 traitlets==4.3.3
 Werkzeug==3.0.3
 yarl==1.2.4
-zipp==2.1.0
+zipp==3.19.1
