@@ -63,7 +63,7 @@ tensorflow==2.11.1
 termcolor==1.1.0
 terminado==0.8.2
 testpath==0.4.2
-torch==1.13.1
+torch==2.2.0
 torchvision==0.2.2.post3
 tornado==6.4.1
 traitlets==4.3.2
