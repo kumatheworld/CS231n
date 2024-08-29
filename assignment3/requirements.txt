@@ -37,7 +37,7 @@ jupyter-client==5.3.4
 jupyter-console==4.0.3
 jupyter-core==4.11.2
 jupyter-http-over-ws==0.0.7
-jupyterlab==3.6.7
+jupyterlab==3.6.8
 jupyterlab-server==1.0.6
 Markdown==2.6.11
 MarkupSafe==0.23
